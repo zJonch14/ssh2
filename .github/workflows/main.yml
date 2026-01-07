@@ -1,0 +1,38 @@
+name: SSH TMATEEEEEEEAJHAHAHA
+
+on:
+  workflow_dispatch:
+    inputs:
+      timeout:
+        description: 'Timeout in minutes'
+        required: false
+        default: '30'
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Install tmate
+      run: sudo apt-get update && sudo apt-get install -y tmate
+      
+    - name: Start tmate session
+      run: |
+        # Iniciar sesión tmate
+        tmate -S /tmp/tmate.sock new-session -d
+        tmate -S /tmp/tmate.sock wait tmate-ready
+        
+        # Obtener información de conexión
+        echo "==========================================="
+        echo "🔧 TMATE DEBUG SESSION - GITHUB ACTIONS"
+        echo "==========================================="
+        echo "SSH: $(tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}')"
+        echo "Web: $(tmate -S /tmp/tmate.sock display -p '#{tmate_web}')"
+        echo "==========================================="
+        echo "Job ID: ${{ github.run_id }}"
+        echo "Runner: ${{ runner.name }}"
+        echo "Timeout: ${{ github.event.inputs.timeout }} minutes"
+        echo "==========================================="
+        
+        # Mantener sesión activa
+        sleep $(( ${{ github.event.inputs.timeout }} * 60 ))
