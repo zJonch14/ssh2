@@ -1,38 +1,138 @@
-name: SSH TMATEEEEEEEAJHAHAHA
+name: MyBot de AvalonNet Free
 
 on:
   workflow_dispatch:
-    inputs:
-      timeout:
-        description: 'Timeout in minutes'
-        required: false
-        default: '30'
+  schedule:
+    - cron: '0 */6 * * *'
 
 jobs:
-  debug:
+  build-and-run:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Install tmate
-      run: sudo apt-get update && sudo apt-get install -y tmate
-      
-    - name: Start tmate session
-      run: |
-        # Iniciar sesión tmate
-        tmate -S /tmp/tmate.sock new-session -d
-        tmate -S /tmp/tmate.sock wait tmate-ready
-        
-        # Obtener información de conexión
-        echo "==========================================="
-        echo "🔧 TMATE DEBUG SESSION - GITHUB ACTIONS"
-        echo "==========================================="
-        echo "SSH: $(tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}')"
-        echo "Web: $(tmate -S /tmp/tmate.sock display -p '#{tmate_web}')"
-        echo "==========================================="
-        echo "Job ID: ${{ github.run_id }}"
-        echo "Runner: ${{ runner.name }}"
-        echo "Timeout: ${{ github.event.inputs.timeout }} minutes"
-        echo "==========================================="
-        
-        # Mantener sesión activa
-        sleep $(( ${{ github.event.inputs.timeout }} * 60 ))
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Install Go dependencies
+        run: |
+          go mod init bot 2>/dev/null || true
+          go get github.com/sandertv/go-raknet 2>/dev/null || true
+          go get github.com/sirupsen/logrus 2>/dev/null || true
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install discord.py
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential gcc g++ make libpcap-dev libssl-dev wget
+
+      - name: Build binaries
+        run: |
+          echo "=== COMPILANDO BINARIOS ==="
+
+          # Compilar métodos principales
+          binaries=(
+            "hex.c:hex"
+            "udp.c:udp"
+            "ovhudp.c:ovhudp"
+            "ovhtcp.c:ovhtcp"
+            "syn.c:syn:-lpthread"
+            "udppps.c:udppps"
+            "tcp.c:tcp" # Agregando el compilar tcp
+          )
+
+          for entry in "${binaries[@]}"; do
+            IFS=':' read -r source binary libs <<< "$entry"
+
+            if [ -f "$source" ]; then
+              echo -n "🔨 $source → $binary ... "
+
+              if [ -n "$libs" ]; then
+                gcc -O3 -pthread "$source" -o "$binary" $libs 2>/dev/null && {
+                  chmod +x "$binary"
+                  echo "✅"
+                } || echo "⚠️"
+              else
+                gcc -O3 "$source" -o "$binary" 2>/dev/null && {
+                  chmod +x "$binary"
+                  echo "✅"
+                } || echo "⚠️"
+              fi
+            fi
+          done
+
+          echo ""
+          echo "📂 Ejecutables disponibles:"
+          ls -la | grep -E '^-..x.*' | awk '{print $9}' || echo "No hay ejecutables"
+
+      - name: 🚀 EJECUTAR BOT CON KEYS
+        env:
+          KEYS: ${{ secrets.KEYS }}  # ¡IMPORTANTE! Esto pasa KEYS al bot.py
+        run: |
+          echo "========================================"
+          echo "🤖 INICIANDO BOT UDP/TCP/AMP/L7"
+          echo "========================================"
+
+          # DEBUG: Verificar que KEYS se recibió
+          echo "🔍 VERIFICANDO CONFIGURACIÓN:"
+          echo "   - Directorio: $(pwd)"
+          echo "   - Archivo bot.py: $(ls -la bot.py 2>/dev/null && echo "✅" || echo "❌")"
+          echo "   - KEYS recibido: $([ -n "$KEYS" ] && echo "✅ (${#KEYS} chars)" || echo "❌ VACÍO")"
+
+          if [ -z "$KEYS" ]; then
+            echo ""
+            echo "❌❌❌ ERROR: KEYS está VACÍO ❌❌❌"
+            echo ""
+            echo "SOLUCIÓN INMEDIATA:"
+            echo "1. El secret 'KEYS' NO está configurado o está vacío"
+            echo "2. Ve a: Settings → Secrets and variables → Actions"
+            echo "3. Haz clic en 'KEYS' para verificar su contenido"
+            echo "4. Si está vacío, edítalo y pega tu token"
+            echo ""
+            echo "Token de Discord debe tener ~59 caracteres como:"
+            echo "pito"
+            exit 1
+          fi
+
+          # Verificar formato del token
+          if [ ${#KEYS} -lt 50 ]; then
+            echo "⚠️  ADVERTENCIA: Token muy corto (${#KEYS} chars)"
+            echo "   Debe tener ~59 caracteres mínimo"
+          fi
+
+          echo ""
+          echo "✅ CONFIGURACIÓN CORRECTA"
+          echo "   Token recibido: ${#KEYS} caracteres"
+          echo "   Vista previa: ${KEYS:0:15}..."
+          echo ""
+          echo "🎮 MÉTODOS DISPONIBLES:"
+
+          # Mostrar métodos según ejecutables
+          for method in hex udp ovhudp ovhtcp syn udppps tcp; do
+            [ -f "$method" ] && echo "   • $method"
+          done
+
+          echo ""
+          echo "🚀 INICIANDO bot.py..."
+          echo "========================================"
+
+          # Ejecutar bot.py (KEYS ya está como variable de entorno)
+          python3 bot.py
+
+          echo ""
+          echo "========================================"
+          echo "🤖 BOT FINALIZADO"
+          echo "========================================"
