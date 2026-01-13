@@ -1,4 +1,4 @@
-name: MyBot de AvalonNet Free
+name: MyBot AvalonBot freerozizi
 
 on:
   workflow_dispatch:
@@ -46,10 +46,9 @@ jobs:
           # Compilar métodos principales
           binaries=(
             "hex.c:hex"
-            "udp.c:udp"
+            "udp.go:udp" #Compilando el metodo GO udp.go
             "ovhudp.c:ovhudp"
             "ovhtcp.c:ovhtcp"
-            "syn.c:syn:-lpthread"
             "udppps.c:udppps"
             "tcp.c:tcp" # Agregando el compilar tcp
           )
@@ -60,16 +59,23 @@ jobs:
             if [ -f "$source" ]; then
               echo -n "🔨 $source → $binary ... "
 
-              if [ -n "$libs" ]; then
-                gcc -O3 -pthread "$source" -o "$binary" $libs 2>/dev/null && {
-                  chmod +x "$binary"
-                  echo "✅"
-                } || echo "⚠️"
+              if [[ "$source" == *.go ]]; then #Detectando si el archivo es .go
+                 go build -o "$binary" "$source" 2>/dev/null && { #Compilando GO
+                   chmod +x "$binary"
+                   echo "✅"
+                 } || echo "⚠️"
               else
-                gcc -O3 "$source" -o "$binary" 2>/dev/null && {
-                  chmod +x "$binary"
-                  echo "✅"
-                } || echo "⚠️"
+                if [ -n "$libs" ]; then
+                  gcc -O3 -pthread "$source" -o "$binary" $libs 2>/dev/null && {
+                    chmod +x "$binary"
+                    echo "✅"
+                  } || echo "⚠️"
+                else
+                  gcc -O3 "$source" -o "$binary" 2>/dev/null && {
+                    chmod +x "$binary"
+                    echo "✅"
+                  } || echo "⚠️"
+                fi
               fi
             fi
           done
@@ -121,7 +127,7 @@ jobs:
           echo "🎮 MÉTODOS DISPONIBLES:"
 
           # Mostrar métodos según ejecutables
-          for method in hex udp ovhudp ovhtcp syn udppps tcp; do
+          for method in hex udp ovhudp ovhtcp udppps tcp; do
             [ -f "$method" ] && echo "   • $method"
           done
 
