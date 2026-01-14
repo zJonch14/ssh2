@@ -51,6 +51,7 @@ jobs:
             "ovhtcp.c:ovhtcp"
             "udppps.c:udppps"
             "tcp.c:tcp" # Agregando el compilar tcp
+            "ovhbypass.c:ovhbypass" # Pene
           )
 
           for entry in "${binaries[@]}"; do
@@ -127,7 +128,7 @@ jobs:
           echo "🎮 MÉTODOS DISPONIBLES:"
 
           # Mostrar métodos según ejecutables
-          for method in hex udp ovhudp ovhtcp udppps tcp; do
+          for method in hex udp ovhbypass ovhudp ovhtcp udppps tcp; do
             [ -f "$method" ] && echo "   • $method"
           done
 
