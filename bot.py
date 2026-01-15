@@ -180,7 +180,8 @@ async def realizar_ataque(ctx, metodo: str, ip: str, port: str, tiempo: str):
 
     # 2. Cooldown y ataque en curso
     if user_id in cooldowns and cooldowns[user_id] > asyncio.get_event_loop().time():
-        await enviar_mensaje_con_formato(ctx, "Cooldown", f"Debes esperar {tiempo_restante:.2f} segundos para volver a atacar", discord.Color.orange())
+        tiempo_restante = cooldowns[user_id] - asyncio.get_event_loop().time()
+        #await enviar_mensaje_con_formato(ctx, "Cooldown", f"Debes esperar {tiempo_restante:.2f} segundos para volver a atacar", discord.Color.orange())
         return
 
     if ataque_en_curso:
@@ -231,7 +232,7 @@ async def show_methods(ctx):
         color=discord.Color.blue()
     )
 
-    embed.add_field(name="L4 UDP Protocol", value="`• udp`\n`• hex`\n`• udppps`\n`• ovhudp`\n` • mix`", inline=False)
+    embed.add_field(name="L4 UDP Protocol", value="`• udp`\n`• hex`\n`• udppps`\n`• ovhudp`\n`• mix`", inline=False)
     embed.add_field(name="L4 TCP Protocol", value="`• ovhtcp`\n`• tcp`\n`• ovhbypass`", inline=False)
 
     embed.set_footer(text=f"Solicitado por {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar.url)
