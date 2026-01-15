@@ -227,7 +227,7 @@ async def realizar_ataque(ctx, metodo: str, ip: str, port: str, tiempo: str):
 async def show_methods(ctx):
     embed = discord.Embed(
         title="Metodos Disponibles",
-        description="ovhbypass new method",
+        description="ovhbypass, udpmix new methods",
         color=discord.Color.blue()
     )
 
